@@ -4,15 +4,28 @@
 
 using pb::PushButton;
 
-PushButton pb1(1);
-PushButton pb2(2);
+PushButton pb1(D0);
+PushButton pb2(D1);
 
 void setup()
 {
-    // put your setup code here, to run once:
+    Serial.begin(115200);
 }
 
 void loop()
 {
-    // put your main code here, to run repeatedly:
+    switch (pb1.getEvent()) {
+    case PushButton::Event::SHORT_PRESS:
+        Serial.println("PushButton::Event::SHORT_PRESS");
+        break;
+    case PushButton::Event::LONG_HOLD:
+        Serial.println("PushButton::Event::LONG_HOLD");
+        break;
+    case PushButton::Event::DOUBLE_PRESS:
+        Serial.println("PushButton::Event::DOUBLE_PRESS");
+        break;
+    default:
+        Serial.println("PushButton::Event::NONE");
+        break;
+    }
 }
