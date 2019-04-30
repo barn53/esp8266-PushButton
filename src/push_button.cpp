@@ -24,7 +24,6 @@ void PushButton::detach()
 
 void PushButton::reset()
 {
-    detach();
     m_sequence = 0;
     m_expected_interrupt_edge = m_initial_edge;
 
@@ -34,12 +33,16 @@ void PushButton::reset()
     }
 
     pinMode(m_pin, m_initial_edge == FALLING ? INPUT_PULLUP : INPUT);
-    attach();
 }
 
 void PushButton::handleInterrupt()
 {
     detach();
+
+    ++m_interrupt_counter;
+    if (m_sequence >= SEQUENCE_LENGTH) {
+        reset();
+    }
 
     if (m_sequence < SEQUENCE_LENGTH) {
         m_debounced_sequence[m_sequence] = m_expected_interrupt_edge;
@@ -55,10 +58,7 @@ void PushButton::handleInterrupt()
 
     if (m_sequence <= SEQUENCE_LENGTH) {
         // debouncing
-        Ticker t;
-        t.once_ms(DEBOUNCE_MILLIS, attach_wrapper, reinterpret_cast<uint32_t>(this));
-    } else {
-        reset();
+        m_ticker.once_ms(DEBOUNCE_MILLIS, attach_wrapper, reinterpret_cast<uint32_t>(this));
     }
 }
 
@@ -69,41 +69,49 @@ void PushButton::handleInterrupt()
 PushButton::PushButton(uint8_t pin)
     : m_pin(pin)
     , m_initial_edge(FALLING)
+    , m_interrupt_counter(0)
 {
-    interrupts();
     reset();
+    attach();
 }
 
 PushButton::PushButton(uint8_t pin, uint8_t initialEdge)
     : m_pin(pin)
     , m_initial_edge(initialEdge)
+    , m_interrupt_counter(0)
 {
-    interrupts();
     reset();
+    attach();
 }
 
 PushButton::Event PushButton::getEvent()
 {
-    detach();
-
     Event e(Event::NONE);
+
     if (m_sequence == 2) {
-        if (m_sequence_timer[1] < 1000) {
-            e = Event::SHORT_PRESS;
-        } else if (m_sequence_timer[1] < 2000) {
-            e = Event::LONG_HOLD;
+        if (millis() - m_sequence_timer[0] > MAX_MILLIS_SHORT_PRESS) {
+            if (m_sequence_timer[1] < MAX_MILLIS_SHORT_PRESS) {
+                e = Event::SHORT_PRESS;
+            } else if (m_sequence_timer[1] < MAX_MILLIS_LONG_HOLD) {
+                e = Event::LONG_HOLD;
+            } else {
+                e = Event::INVALID;
+            }
+            reset();
+        } else {
+            e = Event::NOT_READY;
         }
-        reset();
     } else if (m_sequence == 4) {
-        if (m_sequence_timer[1] < 1000
-            && m_sequence_timer[2] < 1000
-            && m_sequence_timer[3] < 1000) {
+        if (m_sequence_timer[1] < MAX_MILLIS_DOUBLE_PRESS_GAP
+            && m_sequence_timer[2] < MAX_MILLIS_DOUBLE_PRESS_GAP * 2
+            && m_sequence_timer[3] < MAX_MILLIS_DOUBLE_PRESS_GAP * 3) {
             e = Event::DOUBLE_PRESS;
+        } else {
+            e = Event::INVALID;
         }
         reset();
     }
 
-    attach();
     return e;
 }
 } // namespace pb
