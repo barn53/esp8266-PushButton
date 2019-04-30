@@ -92,17 +92,15 @@ PushButton::Event PushButton::getEvent()
             e = Event::SHORT_PRESS;
         } else if (m_sequence_timer[1] < 2000) {
             e = Event::LONG_HOLD;
-        } else { // invalid sequence
-            reset();
         }
+        reset();
     } else if (m_sequence == 4) {
         if (m_sequence_timer[1] < 1000
             && m_sequence_timer[2] < 1000
             && m_sequence_timer[3] < 1000) {
             e = Event::DOUBLE_PRESS;
-        } else { // invalid sequence
-            reset();
         }
+        reset();
     }
 
     attach();
