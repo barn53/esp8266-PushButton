@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include <Ticker.h>
 
 namespace pb {
 class PushButton {

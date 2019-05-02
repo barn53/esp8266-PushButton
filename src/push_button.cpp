@@ -1,5 +1,4 @@
 #include <FunctionalInterrupt.h>
-#include <Ticker.h>
 
 #include "push_button.h"
 
