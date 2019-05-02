@@ -3,14 +3,6 @@
 
 #include "push_button.h"
 
-namespace {
-void attach_wrapper(uint32_t pb)
-{
-    auto pushButton(reinterpret_cast<pb::PushButton*>(pb));
-    pushButton->attach();
-}
-}
-
 namespace pb {
 void PushButton::attach()
 {
@@ -61,7 +53,7 @@ void PushButton::handleInterrupt()
 
     if (m_sequence <= SEQUENCE_LENGTH) {
         // debouncing
-        m_ticker.once_ms(DEBOUNCE_MILLIS, attach_wrapper, reinterpret_cast<uint32_t>(this));
+        m_ticker.once_ms(DEBOUNCE_MILLIS, std::bind(&PushButton::attach, this));
     }
 }
 
