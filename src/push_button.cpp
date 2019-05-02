@@ -28,7 +28,6 @@ void PushButton::reset()
     m_expected_interrupt_edge = m_initial_edge;
 
     for (uint8_t ii = 0; ii < SEQUENCE_LENGTH; ++ii) {
-        m_debounced_sequence[ii] = 0;
         m_sequence_timer[ii] = 0;
     }
 
@@ -39,18 +38,22 @@ void PushButton::handleInterrupt()
 {
     detach();
 
-    ++m_interrupt_counter;
     if (m_sequence >= SEQUENCE_LENGTH) {
         reset();
     }
 
     if (m_sequence < SEQUENCE_LENGTH) {
-        m_debounced_sequence[m_sequence] = m_expected_interrupt_edge;
         m_sequence_timer[m_sequence] = (m_sequence == 0
                 ? millis()
                 : millis() - m_sequence_timer[0]);
     }
     ++m_sequence;
+
+    /*
+    for (uint8_t ii = 0; ii < SEQUENCE_LENGTH; ++ii) {
+        Serial.printf("m_sequence_timer[%d]: %d\n", ii, m_sequence_timer[ii]);
+    }
+    */
 
     m_expected_interrupt_edge = (m_expected_interrupt_edge == FALLING
             ? RISING
@@ -69,7 +72,6 @@ void PushButton::handleInterrupt()
 PushButton::PushButton(uint8_t pin)
     : m_pin(pin)
     , m_initial_edge(FALLING)
-    , m_interrupt_counter(0)
 {
     reset();
     attach();
@@ -78,7 +80,6 @@ PushButton::PushButton(uint8_t pin)
 PushButton::PushButton(uint8_t pin, uint8_t initialEdge)
     : m_pin(pin)
     , m_initial_edge(initialEdge)
-    , m_interrupt_counter(0)
 {
     reset();
     attach();
@@ -92,6 +93,8 @@ PushButton::Event PushButton::getEvent()
         if (millis() - m_sequence_timer[0] > MAX_MILLIS_SHORT_PRESS) {
             if (m_sequence_timer[1] < MAX_MILLIS_SHORT_PRESS) {
                 e = Event::SHORT_PRESS;
+            } else if (m_sequence_timer[1] < MAX_MILLIS_LONG_PRESS) {
+                e = Event::LONG_PRESS;
             } else if (m_sequence_timer[1] < MAX_MILLIS_LONG_HOLD) {
                 e = Event::LONG_HOLD;
             } else {
@@ -102,10 +105,25 @@ PushButton::Event PushButton::getEvent()
             e = Event::NOT_READY;
         }
     } else if (m_sequence == 4) {
-        if (m_sequence_timer[1] < MAX_MILLIS_DOUBLE_PRESS_GAP
-            && m_sequence_timer[2] < MAX_MILLIS_DOUBLE_PRESS_GAP * 2
-            && m_sequence_timer[3] < MAX_MILLIS_DOUBLE_PRESS_GAP * 3) {
-            e = Event::DOUBLE_PRESS;
+        if (millis() - m_sequence_timer[0] > MAX_MILLIS_MULTI_PRESS_GAP * 3) {
+            if (m_sequence_timer[1] < MAX_MILLIS_MULTI_PRESS_GAP
+                && m_sequence_timer[2] < MAX_MILLIS_MULTI_PRESS_GAP * 2
+                && m_sequence_timer[3] < MAX_MILLIS_MULTI_PRESS_GAP * 3) {
+                e = Event::DOUBLE_PRESS;
+            } else {
+                e = Event::INVALID;
+            }
+            reset();
+        } else {
+            e = Event::NOT_READY;
+        }
+    } else if (m_sequence == 6) {
+        if (m_sequence_timer[1] < MAX_MILLIS_MULTI_PRESS_GAP
+            && m_sequence_timer[2] < MAX_MILLIS_MULTI_PRESS_GAP * 2
+            && m_sequence_timer[3] < MAX_MILLIS_MULTI_PRESS_GAP * 3
+            && m_sequence_timer[4] < MAX_MILLIS_MULTI_PRESS_GAP * 4
+            && m_sequence_timer[5] < MAX_MILLIS_MULTI_PRESS_GAP * 5) {
+            e = Event::TRIPLE_PRESS;
         } else {
             e = Event::INVALID;
         }
