@@ -40,11 +40,9 @@ void PushButton::handleInterrupt()
     }
     ++m_sequence;
 
-    /*
-    for (uint8_t ii = 0; ii < SEQUENCE_LENGTH; ++ii) {
-        Serial.printf("m_sequence_timer[%d]: %d\n", ii, m_sequence_timer[ii]);
-    }
-    */
+    // for (uint8_t ii = 0; ii < SEQUENCE_LENGTH; ++ii) {
+    //     Serial.printf("m_sequence_timer[%d]: %d\n", ii, m_sequence_timer[ii]);
+    // }
 
     m_expected_interrupt_edge = (m_expected_interrupt_edge == FALLING
             ? RISING
