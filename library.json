@@ -1,0 +1,10 @@
+{
+    "name": "PushButton",
+    "version": "0.1.0",
+    "keywords": "push button pushbutton switch press klick hold double long triple",
+    "description": "Arduino library that provides debounced push button functionality on GPIO pins.",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/gerdmuller/esp8266-PushButton.git"
+    }
+}
