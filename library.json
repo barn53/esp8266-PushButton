@@ -6,5 +6,9 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/gerdmuller/esp8266-PushButton.git"
-    }
+    },
+    "platforms": [
+        "espressif8266",
+        "espressif32"
+    ]
 }
