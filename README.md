@@ -1,5 +1,6 @@
 # esp8266-PushButton
-## A simple library that provides debounced push button functionality on GPIO pins.
+## Arduino library that provides debounced push button functionality on GPIO pins.
+### Tested only on ESP8266
 
 One class instance per pin
 
