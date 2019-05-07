@@ -9,6 +9,7 @@
 - triple press
 
 One class instance per pin.
+
 Tested only on ESP8266.
 
 ### Usage:
