@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/gerdmuller/esp8266-PushButton.svg?branch=master)](https://travis-ci.org/gerdmuller/esp8266-PushButton)
+
 # esp8266-PushButton
 ## Arduino library that provides debounced push button functionality on GPIO pins.
 
