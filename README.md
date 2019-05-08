@@ -16,7 +16,6 @@ Tested only on ESP8266.
 
 ### Usage:
 ````
-#include <Arduino.h>
 #include <push_button.h>
 ...
 pb::PushButton button(D1);
