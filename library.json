@@ -1,6 +1,6 @@
 {
     "name": "PushButton",
-    "version": "0.1.0",
+    "version": "0.1.2",
     "keywords": "push button pushbutton momentary switch press klick hold double long triple",
     "description": "Arduino library that provides debounced push button functionality on GPIO pins.",
     "repository": {
