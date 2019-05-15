@@ -7,6 +7,9 @@
         "type": "git",
         "url": "https://github.com/gerdmuller/esp8266-PushButton.git"
     },
+    "frameworks": [
+        "arduino"
+    ],
     "platforms": [
         "espressif8266",
         "espressif32"
